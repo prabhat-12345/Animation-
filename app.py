@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 # Page configurations
 st.set_page_config(page_title="For My Heartbeat ❤️", page_icon="💖", layout="centered")
 
-# Hide Streamlit default styling for clean premium look
+# Hide Streamlit elements
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -12,12 +12,11 @@ st.markdown("""
         header {visibility: hidden;}
         .block-container {padding-top: 1rem;}
     </style>
-""", unsafe_scale=True)
+""", unsafe_allow_html=True)
 
-# App Title for you (Optional)
 st.markdown("<h2 style='text-align: center; color: #ff3366; font-family: sans-serif;'>💖 Premium Interactive Love Gift 💖</h2>", unsafe_allow_html=True)
 
-# Premium HTML, CSS aur JavaScript Injection
+# Fixed HTML variable with proper triple quotes closure
 romantic_card_html = """
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +94,6 @@ romantic_card_html = """
     }
     resize();
 
-    // Slingshot parameters (styled as a beautiful glowing node)
     const anchor = { x: canvas.width / 2, y: canvas.height - 150 };
     const sling = { x: anchor.x, y: anchor.y, radius: 18 };
     let isDragging = false;
@@ -104,9 +102,7 @@ romantic_card_html = """
     let bgHearts = [];
     let showCard = false;
     let cardScale = 0;
-    let globalAlpha = 0;
 
-    // Helper to draw a perfect vector heart shape
     function drawHeartShape(x, y, size) {
         ctx.beginPath();
         ctx.moveTo(x, y);
@@ -115,7 +111,6 @@ romantic_card_html = """
         ctx.fill();
     }
 
-    // Background floating ambient hearts
     class AmbientHeart {
         constructor() {
             this.x = Math.random() * canvas.width;
@@ -133,18 +128,16 @@ romantic_card_html = """
         }
         draw() {
             ctx.save();
-            ctx.fillStyle = `rgba(255, 182, 193, ${this.opacity})`;
+            ctx.fillStyle = 'rgba(255, 182, 193, ' + this.opacity + ')';
             drawHeartShape(this.x, this.y, this.size);
             ctx.restore();
         }
     }
 
-    // Premium Burst Hearts
     class BurstHeart {
         constructor(x, y, vx, vy) {
             this.x = x;
             this.y = y;
-            // High energy physics dispersion
             this.vx = vx * 0.25 + (Math.random() - 0.5) * 12;
             this.vy = vy * 0.25 - (Math.random() * 8 + 6);
             this.size = Math.random() * 18 + 12;
@@ -156,7 +149,7 @@ romantic_card_html = """
         update() {
             this.x += this.vx;
             this.y += this.vy;
-            this.vy += 0.12; // gentle gravity
+            this.vy += 0.12;
             this.vx *= 0.98;
             this.alpha -= this.decay;
             this.angle += this.rotationSpeed;
@@ -167,28 +160,21 @@ romantic_card_html = """
             ctx.globalAlpha = this.alpha;
             ctx.translate(this.x, this.y);
             ctx.rotate(this.angle);
-            
-            // Neon shadow glow for premium feel
             ctx.shadowBlur = 15;
             ctx.shadowColor = '#ff0055';
-            
-            // Gradient fill for each heart
             let grad = ctx.createRadialGradient(0, 0, 2, 0, 0, this.size);
             grad.addColorStop(0, '#ff758c');
             grad.addColorStop(1, '#ff7eb3');
             ctx.fillStyle = grad;
-            
             drawHeartShape(0, -this.size/2, this.size);
             ctx.restore();
         }
     }
 
-    // Initialize background stars/hearts
     for(let i=0; i<25; i++) {
         bgHearts.push(new AmbientHeart());
     }
 
-    // User Interaction handling
     function getMousePos(e) {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches.clientX : e.clientX;
@@ -221,18 +207,14 @@ romantic_card_html = """
     function endDrag() {
         if (!isDragging) return;
         isDragging = false;
-        
         const vx = anchor.x - sling.x;
         const vy = anchor.y - sling.y;
-        
         if (Math.hypot(vx, vy) > 20) {
-            // Big dynamic romantic burst (50 premium hearts)
             for(let i=0; i<50; i++) {
                 burstHearts.push(new BurstHeart(anchor.x, anchor.y, vx, vy));
             }
             showCard = true;
         }
-        
         sling.x = anchor.x;
         sling.y = anchor.y;
     }
@@ -240,22 +222,18 @@ romantic_card_html = """
     canvas.addEventListener('mousedown', startDrag);
     canvas.addEventListener('mousemove', drag);
     window.addEventListener('mouseup', endDrag);
-
     canvas.addEventListener('touchstart', startDrag);
     canvas.addEventListener('touchmove', drag);
     window.addEventListener('touchend', endDrag);
 
-    // Render loop
     function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. Draw Ambient Background Hearts
         bgHearts.forEach(bh => {
             bh.update();
             bh.draw();
         });
 
-        // 2. Draw Top Heading
         ctx.save();
         ctx.fillStyle = 'rgba(255, 230, 235, 0.9)';
         ctx.font = 'italic 20px Georgia';
@@ -265,37 +243,57 @@ romantic_card_html = """
         ctx.fillText('a little something, for you', canvas.width / 2, 70);
         ctx.restore();
 
-        // 3. Draw Premium Birthday Glass Card
         if (showCard) {
-            if (cardScale < 1) cardScale += 0.04; // smooth pop up
+            if (cardScale < 1) cardScale += 0.04;
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 3 + 10);
             ctx.scale(cardScale, cardScale);
-
-            // Glowing Premium Translucent Box
             ctx.shadowBlur = 30;
             ctx.shadowColor = 'rgba(255, 0, 85, 0.6)';
-            
-            // Glass fill layer
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             ctx.beginPath();
             ctx.roundRect(-160, -110, 320, 220, 20);
             ctx.fill();
-            
-            // Neon premium pink border line
             ctx.strokeStyle = '#ff2a6d';
             ctx.lineWidth = 3;
             ctx.stroke();
 
-            // Inner clean gold accent border
-            ctx.strokeStyle = 'rgba(218, 165, 32, 0.3)';
-            ctx.lineWidth = 1;
-            ctx.roundRect(-152, -102, 304, 204, 15);
-            ctx.stroke();
-
-            // Card Text Content Typography
             ctx.shadowBlur = 0;
             ctx.textAlign = 'center';
-            
             ctx.fillStyle = '#ff0055';
-            
+            ctx.font = 'bold 28px sans-serif';
+            ctx.fillText('🎂 HAPPY 🎂', 0, -45);
+            ctx.fillText('BIRTHDAY!', 0, -10);
+            ctx.fillStyle = '#4a0e17';
+            ctx.font = 'italic 16px Georgia';
+            ctx.fillText('May all your dreams come true,', 0, 35);
+            ctx.fillText('my beautiful queen! ✨', 0, 58);
+            ctx.fillStyle = '#ff3366';
+            ctx.font = '18px Arial';
+            ctx.fillText('❤️ 💖 ❤️', 0, 92);
+            ctx.restore();
+        }
+
+        for (let i = burstHearts.length - 1; i >= 0; i--) {
+            burstHearts[i].update();
+            burstHearts[i].draw();
+            if (burstHearts[i].alpha <= 0) {
+                burstHearts.splice(i, 1);
+            }
+        }
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 42, 109, 0.8)';
+        ctx.lineWidth = 5;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#ff0055';
+        ctx.beginPath();
+        ctx.moveTo(anchor.x - 50, anchor.y - 15);
+        ctx.lineTo(sling.x, sling.y);
+        ctx.moveTo(anchor.x + 50, anchor.y - 15);
+        ctx.lineTo(sling.x, sling.y);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        
