@@ -2,40 +2,52 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # Page configurations
-st.set_page_config(page_title="Interactive Birthday Gift", page_icon="❤️", layout="centered")
+st.set_page_config(page_title="For My Heartbeat ❤️", page_icon="💖", layout="centered")
 
-# App Header
-st.title("🎉 Interactive Birthday Web App")
-st.write("Slingshot (guthail) ko mouse se peeche **PULL karke RELEASE** karein surprise dekhne ke liye!")
+# Hide Streamlit default styling for clean premium look
+st.markdown("""
+    <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        .block-container {padding-top: 1rem;}
+    </style>
+""", unsafe_scale=True)
+
+# App Title for you (Optional)
+st.markdown("<h2 style='text-align: center; color: #ff3366; font-family: sans-serif;'>💖 Premium Interactive Love Gift 💖</h2>", unsafe_allow_html=True)
 
 # Premium HTML, CSS aur JavaScript Injection
-birthday_card_html = """
+romantic_card_html = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday My Love</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 100%);
+            background: radial-gradient(circle at center, #ffccd5 0%, #ff4d6d 50%, #800f2f 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Georgia', serif;
             overflow: hidden;
         }
-        .canvas-container {
+        .container {
             position: relative;
             width: 100%;
-            max-width: 500px;
-            height: 600px;
-            background: #fff0f5;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(255, 105, 180, 0.3);
+            max-width: 480px;
+            height: 680px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2);
             overflow: hidden;
-            border: 4px solid #ff85a2;
+            border: 2px solid rgba(255, 255, 255, 0.25);
         }
         canvas {
             display: block;
@@ -44,89 +56,143 @@ birthday_card_html = """
             cursor: grab;
         }
         canvas:active { cursor: grabbing; }
-        .hint-text {
+        .instruction {
             position: absolute;
-            bottom: 30px;
+            bottom: 40px;
             width: 100%;
             text-align: center;
-            font-size: 14px;
-            color: #ff5c8a;
-            font-weight: bold;
-            letter-spacing: 2px;
+            font-size: 13px;
+            color: #fff;
+            font-family: 'Helvetica Neue', sans-serif;
+            font-weight: 600;
+            letter-spacing: 3px;
             text-transform: uppercase;
             pointer-events: none;
-            animation: pulse 1.5s infinite;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            animation: pulseGlow 2s infinite ease-in-out;
         }
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(0.98); text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+            50% { opacity: 1; transform: scale(1); text-shadow: 0 0 15px rgba(255,105,180,1); }
+            100% { opacity: 0.5; transform: scale(0.98); text-shadow: 0 0 5px rgba(255,255,255,0.5); }
         }
     </style>
 </head>
 <body>
 
-<div class="canvas-container">
-    <canvas id="giftCanvas"></canvas>
-    <div class="hint-text">PULL & RELEASE THE SLINGSHOT</div>
+<div class="container">
+    <canvas id="loveCanvas"></canvas>
+    <div class="instruction">💖 Pull & Release the Heart 💖</div>
 </div>
 
 <script>
-    const canvas = document.getElementById('giftCanvas');
+    const canvas = document.getElementById('loveCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Resize canvas resolution
     function resize() {
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = canvas.parentElement.clientHeight;
     }
     resize();
 
-    // Slingshot parameters
-    const sling = { x: canvas.width / 2, y: canvas.height - 120, radius: 10 };
-    const anchor = { x: canvas.width / 2, y: canvas.height - 120 };
+    // Slingshot parameters (styled as a beautiful glowing node)
+    const anchor = { x: canvas.width / 2, y: canvas.height - 150 };
+    const sling = { x: anchor.x, y: anchor.y, radius: 18 };
     let isDragging = false;
 
-    // Heart animations array
-    let hearts = [];
+    let burstHearts = [];
+    let bgHearts = [];
     let showCard = false;
     let cardScale = 0;
+    let globalAlpha = 0;
 
-    // Heart class for floating effect
-    class FloatingHeart {
-        constructor(x, y, vx, vy) {
-            this.x = x;
-            this.y = y;
-            this.vx = vx * 0.15;
-            this.vy = vy * 0.15 - 5; // upward force
-            this.size = Math.random() * 15 + 15;
-            this.alpha = 1;
+    // Helper to draw a perfect vector heart shape
+    function drawHeartShape(x, y, size) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.bezierCurveTo(x - size/2, y - size/2, x - size, y + size/3, x, y + size);
+        ctx.bezierCurveTo(x + size, y + size/3, x + size/2, y - size/2, x, y);
+        ctx.fill();
+    }
+
+    // Background floating ambient hearts
+    class AmbientHeart {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height + Math.random() * 100;
+            this.size = Math.random() * 8 + 6;
+            this.speed = Math.random() * 0.8 + 0.4;
+            this.opacity = Math.random() * 0.4 + 0.2;
         }
         update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.vy *= 0.98; // slowdown
-            this.alpha -= 0.01;
+            this.y -= this.speed;
+            if (this.y < -20) {
+                this.y = canvas.height + 20;
+                this.x = Math.random() * canvas.width;
+            }
         }
         draw() {
             ctx.save();
-            ctx.globalAlpha = this.alpha;
-            ctx.fillStyle = '#ff477e';
-            ctx.beginPath();
-            // Draw smooth heart path
-            ctx.moveTo(this.x, this.y);
-            ctx.bezierCurveTo(this.x - this.size/2, this.y - this.size/2, this.x - this.size, this.y + this.size/3, this.x, this.y + this.size);
-            ctx.bezierCurveTo(this.x + this.size, this.y + this.size/3, this.x + this.size/2, this.y - this.size/2, this.x, this.y);
-            ctx.fill();
+            ctx.fillStyle = `rgba(255, 182, 193, ${this.opacity})`;
+            drawHeartShape(this.x, this.y, this.size);
             ctx.restore();
         }
     }
 
-    // Mouse/Touch Events
+    // Premium Burst Hearts
+    class BurstHeart {
+        constructor(x, y, vx, vy) {
+            this.x = x;
+            this.y = y;
+            // High energy physics dispersion
+            this.vx = vx * 0.25 + (Math.random() - 0.5) * 12;
+            this.vy = vy * 0.25 - (Math.random() * 8 + 6);
+            this.size = Math.random() * 18 + 12;
+            this.alpha = 1;
+            this.decay = Math.random() * 0.01 + 0.008;
+            this.angle = Math.random() * Math.PI * 2;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += 0.12; // gentle gravity
+            this.vx *= 0.98;
+            this.alpha -= this.decay;
+            this.angle += this.rotationSpeed;
+        }
+        draw() {
+            if (this.alpha <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = this.alpha;
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            
+            // Neon shadow glow for premium feel
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff0055';
+            
+            // Gradient fill for each heart
+            let grad = ctx.createRadialGradient(0, 0, 2, 0, 0, this.size);
+            grad.addColorStop(0, '#ff758c');
+            grad.addColorStop(1, '#ff7eb3');
+            ctx.fillStyle = grad;
+            
+            drawHeartShape(0, -this.size/2, this.size);
+            ctx.restore();
+        }
+    }
+
+    // Initialize background stars/hearts
+    for(let i=0; i<25; i++) {
+        bgHearts.push(new AmbientHeart());
+    }
+
+    // User Interaction handling
     function getMousePos(e) {
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const clientX = e.touches ? e.touches.clientX : e.clientX;
+        const clientY = e.touches ? e.touches.clientY : e.clientY;
         return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
@@ -139,7 +205,7 @@ birthday_card_html = """
     function drag(e) {
         if (!isDragging) return;
         const pos = getMousePos(e);
-        const maxPull = 80;
+        const maxPull = 90;
         const dist = Math.hypot(pos.x - anchor.x, pos.y - anchor.y);
         
         if (dist < maxPull) {
@@ -156,19 +222,17 @@ birthday_card_html = """
         if (!isDragging) return;
         isDragging = false;
         
-        // Calculate velocity vectors based on pull distance
         const vx = anchor.x - sling.x;
         const vy = anchor.y - sling.y;
         
-        // Spawn hearts on release
         if (Math.hypot(vx, vy) > 20) {
-            for(let i=0; i<15; i++) {
-                hearts.push(new FloatingHeart(anchor.x, anchor.y, vx + (Math.random()-0.5)*20, vy));
+            // Big dynamic romantic burst (50 premium hearts)
+            for(let i=0; i<50; i++) {
+                burstHearts.push(new BurstHeart(anchor.x, anchor.y, vx, vy));
             }
             showCard = true;
         }
         
-        // Snap back slingshot
         sling.x = anchor.x;
         sling.y = anchor.y;
     }
@@ -181,89 +245,57 @@ birthday_card_html = """
     canvas.addEventListener('touchmove', drag);
     window.addEventListener('touchend', endDrag);
 
-    // Main animation loop
-    function animate() {
+    // Render loop
+    function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. Draw Background Text
-        ctx.fillStyle = '#ff85a2';
-        ctx.font = 'italic 18px Georgia';
-        ctx.textAlign = 'center';
-        ctx.fillText('a little something, for you', canvas.width / 2, 80);
-
-        // 2. Draw Birthday Card if Triggered
-        if (showCard) {
-            if (cardScale < 1) cardScale += 0.05;
-            ctx.save();
-            ctx.translate(canvas.width/2, canvas.height/3 + 30);
-            ctx.scale(cardScale, cardScale);
-            
-            // Draw Glowing Card Box
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = 'rgba(255, 71, 126, 0.5)';
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(-150, -100, 300, 200);
-            ctx.strokeStyle = '#ff477e';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(-150, -100, 300, 200);
-            
-            // Card Content
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#ff477e';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText('🎂 HAPPY 🎂', 0, -40);
-            ctx.fillText('BIRTHDAY! 🎉', 0, -5);
-            ctx.fillStyle = '#333';
-            ctx.font = '14px Arial';
-            ctx.fillText('May all your dreams come true!', 0, 40);
-            ctx.fillText('❤️ ✨ ❤️', 0, 70);
-            ctx.restore();
-        }
-
-        // 3. Update & Draw Hearts
-        hearts.forEach((heart, index) => {
-            heart.update();
-            heart.draw();
-            if (heart.alpha <= 0) hearts.splice(index, 1);
+        // 1. Draw Ambient Background Hearts
+        bgHearts.forEach(bh => {
+            bh.update();
+            bh.draw();
         });
 
-        // 4. Draw Slingshot base bands
-        ctx.strokeStyle = '#ff85a2';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(anchor.x - 40, anchor.y - 10);
-        ctx.lineTo(sling.x, sling.y);
-        ctx.moveTo(anchor.x + 40, anchor.y - 10);
-        ctx.lineTo(sling.x, sling.y);
-        ctx.stroke();
+        // 2. Draw Top Heading
+        ctx.save();
+        ctx.fillStyle = 'rgba(255, 230, 235, 0.9)';
+        ctx.font = 'italic 20px Georgia';
+        ctx.textAlign = 'center';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#000';
+        ctx.fillText('a little something, for you', canvas.width / 2, 70);
+        ctx.restore();
 
-        // 5. Draw Slingshot Y frame
-        ctx.strokeStyle = '#db7093';
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        ctx.moveTo(anchor.x - 40, anchor.y - 15);
-        ctx.lineTo(anchor.x - 40, anchor.y + 10);
-        ctx.lineTo(anchor.x, anchor.y + 50);
-        ctx.lineTo(anchor.x, anchor.y + 100);
-        ctx.moveTo(anchor.x + 40, anchor.y - 15);
-        ctx.lineTo(anchor.x + 40, anchor.y + 10);
-        ctx.lineTo(anchor.x, anchor.y + 50);
-        ctx.stroke();
+        // 3. Draw Premium Birthday Glass Card
+        if (showCard) {
+            if (cardScale < 1) cardScale += 0.04; // smooth pop up
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 3 + 10);
+            ctx.scale(cardScale, cardScale);
 
-        // 6. Draw Pull Handle node
-        ctx.fillStyle = '#ff477e';
-        ctx.beginPath();
-        ctx.arc(sling.x, sling.y, sling.radius, 0, Math.PI * 2);
-        ctx.fill();
+            // Glowing Premium Translucent Box
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = 'rgba(255, 0, 85, 0.6)';
+            
+            // Glass fill layer
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+            ctx.beginPath();
+            ctx.roundRect(-160, -110, 320, 220, 20);
+            ctx.fill();
+            
+            // Neon premium pink border line
+            ctx.strokeStyle = '#ff2a6d';
+            ctx.lineWidth = 3;
+            ctx.stroke();
 
-        requestAnimationFrame(animate);
-    }
+            // Inner clean gold accent border
+            ctx.strokeStyle = 'rgba(218, 165, 32, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.roundRect(-152, -102, 304, 204, 15);
+            ctx.stroke();
 
-    animate();
-</script>
-</body>
-</html>
-"""
-
-# Streamlit interface wrapper inside components
-components.html(birthday_card_html, height=650, scrolling=False)
+            // Card Text Content Typography
+            ctx.shadowBlur = 0;
+            ctx.textAlign = 'center';
+            
+            ctx.fillStyle = '#ff0055';
+            
